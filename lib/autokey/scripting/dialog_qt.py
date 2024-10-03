@@ -126,7 +126,12 @@ class QtDialog:
             optionNum += 1
 
         return_code, result = self._run_kdialog(title, ["--radiolist", message] + choices, kwargs)
-        choice = options[int(result)]
+        
+        # Handle cancelation or Esc press (non-zero return code or empty result)
+        if return_code == 0 and result:
+            choice = options[int(result)]
+        else:
+            choice = None  # Set to None when canceled
 
         return DialogData(return_code, choice)
 

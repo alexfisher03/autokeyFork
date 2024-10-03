@@ -121,10 +121,25 @@ class GtkDialog:
 
             choices.append(option)
 
-        return self._run_zenity(
+        # Run the dialog and capture the return code and result
+        return_code, result = self._run_zenity(
             title,
             ["--list", "--radiolist", "--text", message, "--column", " ", "--column", "Options"] + choices,
-            kwargs)
+            kwargs
+        )
+    
+        # Handle the case where the user cancels or presses Esc
+        if return_code == 0:
+            # Normal selection, process the result
+            choice = options[int(result)]
+        else:
+            # User cancelled or pressed Esc
+            choice = None
+
+        # Return both code and user's choice from dialog interaction, lets us capture the both outcomes, whether the user
+        # selected a value or cancelled the dialog
+        return DialogData(return_code, choice)
+            
 
     def list_menu_multi(self, options, title="Choose one or more values", message="Choose one or more values",
                         defaults: list=None, **kwargs):
